@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
     'drf_yasg',
     'users',
     'resumes',
@@ -24,6 +25,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -64,13 +66,19 @@ DATABASES = {
 }
 
 # MongoDB configuration
-MONGO_DB_NAME = config('MONGO_DB')
-MONGO_HOST = config('MONGO_HOST')
+MONGO_DB_NAME = config('MONGO_DB_NAME', default='cvalyzer')
+MONGO_USER = config('MONGO_USER')
+MONGO_PASS = config('MONGO_PASS')
+MONGO_CLUSTER = config('MONGO_CLUSTER')
 
 connect(
     db=MONGO_DB_NAME,
-    host=MONGO_HOST,
-    alias='mongo'
+    host=f'mongodb+srv://{MONGO_USER}:{MONGO_PASS}@{MONGO_CLUSTER}/{MONGO_DB_NAME}?retryWrites=true&w=majority',
+    alias='mongo',
+    username=MONGO_USER,
+    password=MONGO_PASS,
+    authentication_source='admin',
+    ssl=True
 )
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -104,3 +112,11 @@ REST_FRAMEWORK = {
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# CORS Configuration
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+CORS_ALLOW_CREDENTIALS = True
